@@ -1,0 +1,97 @@
+{
+  "$schema": "https://raw.githubusercontent.com/justeat/httpclient-interception/main/src/HttpClientInterception/Bundles/http-request-bundle-schema.json",
+  "id": "bundle",
+  "version": 1,
+  "comment": "HTTP bundle for movies and users.",
+  "items": [
+    {
+      "comment": "GET movies",
+      "uri": "https://dummyapi.online/api/movies",
+      "method": "GET",
+      "contentFormat": "json",
+      "contentJson": [
+        {
+          "id": 4,
+          "movie": "Star Wars: Episode IV - A New Hope",
+          "rating": 8.6,
+          "imdb_url": "https://www.imdb.com/title/tt0076759"
+        },
+        {
+          "id": 5,
+          "movie": "Star Wars: Episode V - The Empire Strikes Back",
+          "rating": 8.7,
+          "imdb_url": "https://www.imdb.com/title/tt0080684"
+        },
+        {
+          "id": 6,
+          "movie": "Star Wars: Episode VI - Return of the Jedi",
+          "rating": 8.3,
+          "image": "images/dark_knight.jpg",
+          "imdb_url": "https://www.imdb.com/title/tt0086190"
+        }
+      ]
+    },
+    {
+      "comment": "GET movie",
+      "uri": "https://dummyapi.online/api/movies/5",
+      "method": "GET",
+      "contentFormat": "json",
+      "contentJson": {
+        "id": 5,
+        "movie": "Star Wars: Episode V - The Empire Strikes Back",
+        "rating": 8.7,
+        "imdb_url": "https://www.imdb.com/title/tt0080684"
+      }
+    },
+    {
+      "comment": "GET users",
+      "uri": "https://dummyapi.online/api/users",
+      "method": "GET",
+      "contentFormat": "json",
+      "contentJson": [
+        {
+          "id": 1,
+          "name": "Luke Skywalker",
+          "username": "starkiller",
+          "email": "luke@holocron.net",
+          "address": {
+            "street": "Lucasfilm",
+            "city": "San Francisco",
+            "state": "CA",
+            "zipcode": "94129"
+          }
+        },
+        {
+          "id": 2,
+          "name": "Darth Vader",
+          "username": "darklordofthesith",
+          "email": "vader@empire.net",
+          "address": {
+            "street": "Lucasfilm",
+            "city": "San Francisco",
+            "state": "CA",
+            "zipcode": "94129"
+          }
+        }
+      ]
+    },
+    {
+      "comment": "GET user",
+      "uri": "https://dummyapi.online/api/users/2",
+      "method": "GET",
+      "contentFormat": "json",
+      "contentJson": {
+        "id": 2,
+        "name": "Darth Vader",
+        "username": "darklordofthesith",
+        "email": "vader@empire.net",
+        "address": {
+          "street": "Lucasfilm",
+          "city": "San Francisco",
+          "state": "CA",
+          "zipcode": "94129"
+        }
+      }
+    }
+  ]
+}
