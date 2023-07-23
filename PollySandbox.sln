@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollySandbox", "src\PollySa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollySandbox.Tests", "tests\PollySandbox.Tests\PollySandbox.Tests.csproj", "{7B45014E-FF63-40D9-A96C-C9ECEA448835}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PollySandbox.Benchmarks", "perf\PollySandbox.Benchmarks\PollySandbox.Benchmarks.csproj", "{EF21E1CD-FBE3-4B8A-A89E-C54EE1C3ECD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{7B45014E-FF63-40D9-A96C-C9ECEA448835}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B45014E-FF63-40D9-A96C-C9ECEA448835}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B45014E-FF63-40D9-A96C-C9ECEA448835}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF21E1CD-FBE3-4B8A-A89E-C54EE1C3ECD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF21E1CD-FBE3-4B8A-A89E-C54EE1C3ECD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF21E1CD-FBE3-4B8A-A89E-C54EE1C3ECD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF21E1CD-FBE3-4B8A-A89E-C54EE1C3ECD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
