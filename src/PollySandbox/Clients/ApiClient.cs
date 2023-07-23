@@ -83,7 +83,7 @@ public abstract class ApiClient
 
     protected string GetTokenForRateLimit(string fallbackToken)
     {
-        var authorization = HttpContextAccessor.HttpContext.Request.Headers.Authorization;
+        var authorization = HttpContextAccessor.HttpContext?.Request.Headers.Authorization;
         return
             !string.IsNullOrEmpty(authorization) ?
             authorization :

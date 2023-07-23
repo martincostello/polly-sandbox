@@ -4,4 +4,5 @@
 using BenchmarkDotNet.Running;
 using PollySandbox.Benchmarks;
 
+BenchmarkRunner.Run<MicroBenchmarks>();
 BenchmarkRunner.Run<AppBenchmarks>();
