@@ -24,7 +24,7 @@ public class MoviesClient : ApiClient, IMoviesClient
     public async Task<IList<Movie>> GetMoviesAsync(CancellationToken cancellationToken)
     {
         return await ExecuteAsync(
-            GetTokenForRateLimit(HttpContextAccessor.HttpContext.Request.Headers.UserAgent),
+            GetTokenForRateLimit(HttpContextAccessor.HttpContext?.Request.Headers.UserAgent),
             ContextPrefix + nameof(GetMoviesAsync),
             _client.GetAsync,
             cancellationToken).ConfigureAwait(false);
