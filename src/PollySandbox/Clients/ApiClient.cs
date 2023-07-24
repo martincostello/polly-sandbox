@@ -27,6 +27,8 @@ public abstract class ApiClient
 
     protected ILogger Logger { get; }
 
+    protected abstract string OperationPrefix { get; }
+
     protected ApiOptions Options { get; }
 
     protected PolicyFactory PolicyFactory { get; }
@@ -97,7 +99,7 @@ public abstract class ApiClient
         Func<Context, CancellationToken, Task<TResult>> action,
         CancellationToken cancellationToken)
     {
-        var context = new Context(operationKey);
+        var context = new Context($"{OperationPrefix}.{operationKey}");
 
         if (clientExecuteOptions?.HandleExecutionFaults.HasValue == true)
         {

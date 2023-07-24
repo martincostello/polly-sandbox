@@ -5,7 +5,6 @@ namespace PollySandbox;
 
 public class MoviesClient : ApiClient, IMoviesClient
 {
-    private const string ContextPrefix = "movies.";
     private readonly IMoviesApi _client;
 
     public MoviesClient(
@@ -21,11 +20,13 @@ public class MoviesClient : ApiClient, IMoviesClient
 
     protected override ApiEndpointOption EndpointOption => Options.MoviesEndpoint();
 
+    protected override string OperationPrefix => "Movies";
+
     public async Task<IList<Movie>> GetMoviesAsync(CancellationToken cancellationToken)
     {
         return await ExecuteAsync(
             GetTokenForRateLimit(HttpContextAccessor.HttpContext?.Request.Headers.UserAgent),
-            ContextPrefix + nameof(GetMoviesAsync),
+            nameof(GetMoviesAsync),
             _client.GetAsync,
             cancellationToken).ConfigureAwait(false);
     }
@@ -39,7 +40,7 @@ public class MoviesClient : ApiClient, IMoviesClient
 
         return await ExecuteAsync(
             GetTokenForRateLimit(id),
-            ContextPrefix + nameof(GetMovieAsync),
+            nameof(GetMovieAsync),
             token => _client.GetAsync(id, token),
             executionOptions,
             cancellationToken).ConfigureAwait(false);
