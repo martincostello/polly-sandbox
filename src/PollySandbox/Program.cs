@@ -25,11 +25,11 @@ app.MapGet("/movies", async (IMoviesClient client, CancellationToken cancellatio
     }
     catch (RateLimitRejectedException)
     {
-        return Results.StatusCode(429);
+        return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
     catch (ExecutionRejectedException)
     {
-        return Results.StatusCode(500);
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
 });
 
@@ -42,11 +42,11 @@ app.MapGet("/movies/{id}", async (string id, IMoviesClient client, CancellationT
     }
     catch (RateLimitRejectedException)
     {
-        return Results.StatusCode(429);
+        return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
     catch (ExecutionRejectedException)
     {
-        return Results.StatusCode(500);
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
 });
 
@@ -58,11 +58,11 @@ app.MapGet("/users", async (IUsersClient client, CancellationToken cancellationT
     }
     catch (RateLimitRejectedException)
     {
-        return Results.StatusCode(429);
+        return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
     catch (ExecutionRejectedException)
     {
-        return Results.StatusCode(500);
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
 });
 
@@ -75,11 +75,11 @@ app.MapGet("/users/{id}", async (string id, IUsersClient client, CancellationTok
     }
     catch (RateLimitRejectedException)
     {
-        return Results.StatusCode(429);
+        return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
     catch (ExecutionRejectedException)
     {
-        return Results.StatusCode(500);
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
 });
 
@@ -97,7 +97,7 @@ app.MapGet("/reload", (IConfiguration config, PolicyStore policyStore, IMemoryCa
     }
 
     return Results.Ok();
-}).ExcludeFromDescription();
+});
 
 app.Run();
 
