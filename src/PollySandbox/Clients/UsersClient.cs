@@ -5,7 +5,6 @@ namespace PollySandbox;
 
 public class UsersClient : ApiClient, IUsersClient
 {
-    private const string ContextPrefix = "users.";
     private readonly IUsersApi _client;
 
     public UsersClient(
@@ -21,11 +20,13 @@ public class UsersClient : ApiClient, IUsersClient
 
     protected override ApiEndpointOption EndpointOption => Options.UsersEndpoint();
 
+    protected override string OperationPrefix => "Users";
+
     public async Task<IList<User>> GetUsersAsync(CancellationToken cancellationToken)
     {
         return await ExecuteAsync(
             GetTokenForRateLimit(HttpContextAccessor.HttpContext.Request.Headers.UserAgent),
-            ContextPrefix + nameof(GetUsersAsync),
+            nameof(GetUsersAsync),
             _client.GetAsync,
             cancellationToken).ConfigureAwait(false);
     }
@@ -39,7 +40,7 @@ public class UsersClient : ApiClient, IUsersClient
 
         return await ExecuteAsync(
             GetTokenForRateLimit(id),
-            ContextPrefix + nameof(GetUserAsync),
+            nameof(GetUserAsync),
             token => _client.GetAsync(id, token),
             executionOptions,
             cancellationToken).ConfigureAwait(false);
