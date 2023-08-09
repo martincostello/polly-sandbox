@@ -3,7 +3,7 @@
 
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
-using Moq;
+using NSubstitute;
 using Refit;
 using Xunit.Abstractions;
 
@@ -153,7 +153,7 @@ public class PolicyFactoryTests
     private PolicyFactory CreateFactory()
     {
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var metricsPublisher = Mock.Of<IMetricsPublisher>();
+        var metricsPublisher = Substitute.For<IMetricsPublisher>();
         var store = new PolicyStore(memoryCache, metricsPublisher, new Random(), OutputHelper.ToLogger<PolicyStore>());
 
         return new PolicyFactory(store, metricsPublisher, OutputHelper.ToLogger<PolicyFactory>());

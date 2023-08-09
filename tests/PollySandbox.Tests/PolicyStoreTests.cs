@@ -3,7 +3,7 @@
 
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
-using Moq;
+using NSubstitute;
 using Polly;
 using Polly.Bulkhead;
 using Polly.CircuitBreaker;
@@ -547,7 +547,7 @@ public class PolicyStoreTests
     private PolicyStore CreateStore()
     {
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var metricsPublisher = Mock.Of<IMetricsPublisher>();
+        var metricsPublisher = Substitute.For<IMetricsPublisher>();
         var random = new Random();
         var logger = OutputHelper.ToLogger<PolicyStore>();
 
