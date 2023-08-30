@@ -11,8 +11,6 @@ public sealed class ApiEndpointOption
 
     public TimeSpan Timeout { get; set; }
 
-    public int MaxParallelization { get; set; } = 100_000;
-
     public double FailureThreshold { get; set; } = 0.5;
 
     public TimeSpan FailureSamplingDuration { get; set; } = TimeSpan.FromSeconds(10);
@@ -30,8 +28,6 @@ public sealed class ApiEndpointOption
     public bool Isolate { get; set; }
 
     public int RateLimit { get; set; }
-
-    public int RateLimitBurst { get; set; } = 10;
 
     public TimeSpan RateLimitPeriod { get; set; } = TimeSpan.FromSeconds(5);
 }

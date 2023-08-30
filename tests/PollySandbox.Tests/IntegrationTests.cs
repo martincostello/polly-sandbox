@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using JustEat.HttpClientInterception;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace PollySandbox;
 
@@ -94,42 +95,60 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
     {
         // Arrange
         Fixture.OverrideConfiguration("Api:Endpoints:Movies:RateLimit", "1");
-        Fixture.OverrideConfiguration("Api:Endpoints:Movies:RateLimitBurst", "1");
         Fixture.OverrideConfiguration("Api:Endpoints:Movies:RateLimitPeriod", "00:01:00", reload: true);
 
-        Fixture.Services.GetRequiredService<PolicyStore>().Clear();
+        string requestUri = "/movies";
 
-        try
+        using var client1 = Fixture.CreateHttpClientForApp();
+        using var client2 = Fixture.CreateHttpClientForApp();
+
+        client1.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "token-1");
+        client2.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "token-2");
+
+        // Act
+        using var response200 = await client1.GetAsync(requestUri);
+
+        // Assert
+        response200.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // Act
+        using var response429 = await client1.GetAsync(requestUri);
+
+        // Assert
+        response429.StatusCode.ShouldBe(HttpStatusCode.TooManyRequests);
+
+        // Act
+        using var otherResponse200 = await client2.GetAsync(requestUri);
+
+        // Assert
+        otherResponse200.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Circuit_Breaker_Can_Be_Isolated_For_An_Endpoint()
+    {
+        // Arrange
+        var iterations = new(string Value, HttpStatusCode Expected)[]
         {
-            string requestUri = "/movies";
+            (bool.FalseString, HttpStatusCode.OK),
+            (bool.TrueString, HttpStatusCode.ServiceUnavailable),
+            (bool.FalseString, HttpStatusCode.OK),
+        };
 
-            using var client1 = Fixture.CreateHttpClientForApp();
-            using var client2 = Fixture.CreateHttpClientForApp();
+        using var client = Fixture.CreateHttpClientForApp();
 
-            client1.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "token-1");
-            client2.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "token-2");
-
-            // Act
-            using var response200 = await client1.GetAsync(requestUri);
-
-            // Assert
-            response200.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-            // Act
-            using var response429 = await client1.GetAsync(requestUri);
-
-            // Assert
-            response429.StatusCode.ShouldBe(HttpStatusCode.TooManyRequests);
-
-            // Act
-            using var otherResponse200 = await client2.GetAsync(requestUri);
-
-            // Assert
-            otherResponse200.StatusCode.ShouldBe(HttpStatusCode.OK);
-        }
-        finally
+        foreach ((var value, var expected) in iterations)
         {
-            Fixture.Services.GetRequiredService<PolicyStore>().Clear();
+            Fixture.OverrideConfiguration("Api:Endpoints:Movies:Isolate", value, reload: true);
+            Fixture.Services.GetRequiredService<IOptionsMonitor<ApiOptions>>().CurrentValue.GetEndpoint("Movies").Isolate.ToString().ShouldBe(value);
+
+            // Act
+            using var movies = await client.GetAsync("/movies");
+            using var users = await client.GetAsync("/users");
+
+            // Assert
+            movies.StatusCode.ShouldBe(expected);
+            users.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
     }
 

@@ -8,16 +8,39 @@ namespace PollySandbox;
 
 internal static class PollyExtensions
 {
-    internal static PolicyBuilder OrHttpRequestFault(this PolicyBuilder builder)
+    private static readonly ResiliencePropertyKey<string> PartitionKey = new ("RateLimitPartition");
+
+    internal static Func<TResult> GetFallbackGenerator<TResult>(this ResilienceContext context)
     {
-        return builder.Or<HttpRequestException>(CannotConnect)
-                      .Or<HttpRequestException>(IsHostNotFound);
+        if (!context.Properties.TryGetValue(FallbackKeys<TResult>.FallbackGenerator, out var fallbackGenerator))
+        {
+            fallbackGenerator = null;
+        }
+
+        return fallbackGenerator;
     }
 
-    internal static PolicyBuilder<TResult> OrHttpRequestFault<TResult>(this PolicyBuilder<TResult> builder)
+    internal static string GetRateLimitPartition(this ResilienceContext context)
     {
-        return builder.Or<HttpRequestException>(CannotConnect)
-                      .Or<HttpRequestException>(IsHostNotFound);
+        if (!context.Properties.TryGetValue(PartitionKey, out var partitionKey))
+        {
+            throw new InvalidOperationException("No rate limit partition key was specified at the resilience pipeline callsite.");
+        }
+
+        return partitionKey;
+    }
+
+    internal static void SetFallbackGenerator<TResult>(this ResilienceContext context, Func<TResult> value)
+        => context.Properties.Set(FallbackKeys<TResult>.FallbackGenerator, value);
+
+    internal static void SetRateLimitPartition(this ResilienceContext context, string value)
+        => context.Properties.Set(PartitionKey, value);
+
+
+    internal static PredicateBuilder<TResult> HandleHttpRequestFault<TResult>(this PredicateBuilder<TResult> builder)
+    {
+        return builder.Handle<HttpRequestException>(CannotConnect)
+                      .Handle<HttpRequestException>(IsHostNotFound);
     }
 
     private static bool CannotConnect(HttpRequestException exception)
@@ -60,5 +83,10 @@ internal static class PollyExtensions
         }
 
         return false;
+    }
+
+    private static class FallbackKeys<T>
+    {
+        public static readonly ResiliencePropertyKey<Func<T>> FallbackGenerator = new("FallbackGenerator");
     }
 }
