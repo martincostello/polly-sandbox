@@ -50,10 +50,10 @@ public partial class ResiliencePipelineFactory
                     {
                         if (context.Context.GetFallbackGenerator<TResult>() is { } generator)
                         {
-                            return Outcome.FromResultAsTask(generator());
+                            return Outcome.FromResultAsValueTask(generator());
                         }
 
-                        return Outcome.FromResultAsTask<TResult>(default);
+                        return Outcome.FromResultAsValueTask<TResult>(default);
                     },
                     Name = $"{endpoint.Name} Fallback",
                     ShouldHandle = shouldHandle,
