@@ -53,7 +53,6 @@ public static partial class ResilienceExtensions
 
                 services.AddResiliencePipeline($"{name}/{resource}", (builder, context) =>
                 {
-                    builder.InstanceName = name;
                     context.EnableReloads<ApiOptions>();
 
                     var registry = context.ServiceProvider.GetRequiredService<ResiliencePipelineRegistry<string>>();
@@ -84,7 +83,6 @@ public static partial class ResilienceExtensions
     {
         services.AddResiliencePipeline(key, (builder, context) =>
         {
-            builder.InstanceName = name;
             context.EnableReloads<ApiOptions>();
             configure(builder, context.GetOptions<ApiOptions>().GetEndpoint(name));
         });
