@@ -11,9 +11,9 @@ public class UsersClient : ApiClient, IUsersClient
         IUsersApi client,
         IHttpContextAccessor httpContextAccessor,
         ApiOptions options,
-        PolicyFactory policyFactory,
+        ResiliencePipelineFactory pipelineFactory,
         ILogger<MoviesClient> logger)
-        : base(httpContextAccessor, options, policyFactory, logger)
+        : base(httpContextAccessor, options, pipelineFactory, logger)
     {
         _client = client;
     }

@@ -12,13 +12,13 @@ public abstract class ApiClient
     protected ApiClient(
         IHttpContextAccessor httpContextAccessor,
         ApiOptions options,
-        PolicyFactory policyFactory,
+        ResiliencePipelineFactory pipelineFactory,
         ILogger logger)
     {
         HttpContextAccessor = httpContextAccessor;
         Logger = logger;
         Options = options;
-        PolicyFactory = policyFactory;
+        PipelineFactory = pipelineFactory;
     }
 
     protected abstract ApiEndpointOption EndpointOption { get; }
@@ -31,7 +31,7 @@ public abstract class ApiClient
 
     protected ApiOptions Options { get; }
 
-    protected PolicyFactory PolicyFactory { get; }
+    protected ResiliencePipelineFactory PipelineFactory { get; }
 
     protected async Task<T> ExecuteAsync<T>(
         string rateLimitToken,
@@ -96,38 +96,40 @@ public abstract class ApiClient
         string rateLimitToken,
         string operationKey,
         ClientExecuteOptions<TResult> clientExecuteOptions,
-        Func<Context, CancellationToken, Task<TResult>> action,
+        Func<ResilienceContext, CancellationToken, ValueTask<TResult>> action,
         CancellationToken cancellationToken)
     {
-        var context = new Context($"{OperationPrefix}.{operationKey}");
+        var context = ResilienceContextPool.Shared.Get($"{OperationPrefix}.{operationKey}", cancellationToken);
 
-        if (clientExecuteOptions?.HandleExecutionFaults.HasValue == true)
+        try
         {
-            IAsyncPolicy<TResult> policy = GetPolicy(
-                rateLimitToken,
-                clientExecuteOptions.FallbackValue,
-                clientExecuteOptions.HandleExecutionFaults.Value,
-                operationKey);
+            context.SetRateLimitPartition(rateLimitToken);
 
-            return await policy.ExecuteAsync(
-                async (context, token) => await action(context, token),
-                context,
-                cancellationToken).ConfigureAwait(false);
+            if (clientExecuteOptions?.HandleExecutionFaults.HasValue is true)
+            {
+                context.SetFallbackGenerator(clientExecuteOptions.FallbackValue);
+
+                var pipeline = PipelineFactory.GetPipeline<TResult>(
+                    EndpointOption,
+                    clientExecuteOptions.HandleExecutionFaults.GetValueOrDefault(),
+                    operationKey);
+
+                return await pipeline.ExecuteAsync(
+                    async (context) => await action(context, context.CancellationToken),
+                    context).ConfigureAwait(false);
+            }
+            else
+            {
+                var pipeline = PipelineFactory.GetPipeline(EndpointOption, operationKey);
+
+                return await pipeline.ExecuteAsync(
+                    async (context) => await action(context, context.CancellationToken),
+                    context).ConfigureAwait(false);
+            }
         }
-        else
+        finally
         {
-            IAsyncPolicy policy = GetPolicy(rateLimitToken, operationKey);
-
-            return await policy.ExecuteAsync(
-                async (context, token) => await action(context, token),
-                context,
-                cancellationToken).ConfigureAwait(false);
+            ResilienceContextPool.Shared.Return(context);
         }
     }
-
-    private IAsyncPolicy<T> GetPolicy<T>(string rateLimitToken, Func<T> fallbackValue, bool handleExecutionFaults, string resource)
-        => PolicyFactory.GetPolicy(rateLimitToken, EndpointOption, fallbackValue, handleExecutionFaults, resource);
-
-    private IAsyncPolicy GetPolicy(string rateLimitToken, string resource)
-        => PolicyFactory.GetPolicy(rateLimitToken, EndpointOption, resource);
 }

@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Martin Costello, 2023. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
-using Microsoft.Extensions.Caching.Memory;
 using Polly;
-using Polly.RateLimit;
+using Polly.RateLimiting;
 using PollySandbox;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +22,7 @@ app.MapGet("/movies", async (IMoviesClient client, CancellationToken cancellatio
     {
         return Results.Ok(await client.GetMoviesAsync(cancellationToken));
     }
-    catch (RateLimitRejectedException)
+    catch (RateLimiterRejectedException)
     {
         return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
@@ -40,7 +39,7 @@ app.MapGet("/movies/{id}", async (string id, IMoviesClient client, CancellationT
         var movie = await client.GetMovieAsync(id, cancellationToken);
         return movie is null ? Results.NotFound() : Results.Ok(movie);
     }
-    catch (RateLimitRejectedException)
+    catch (RateLimiterRejectedException)
     {
         return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
@@ -56,7 +55,7 @@ app.MapGet("/users", async (IUsersClient client, CancellationToken cancellationT
     {
         return Results.Ok(await client.GetUsersAsync(cancellationToken));
     }
-    catch (RateLimitRejectedException)
+    catch (RateLimiterRejectedException)
     {
         return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
@@ -73,7 +72,7 @@ app.MapGet("/users/{id}", async (string id, IUsersClient client, CancellationTok
         var user = await client.GetUserAsync(id, cancellationToken);
         return user is null ? Results.NotFound() : Results.Ok(user);
     }
-    catch (RateLimitRejectedException)
+    catch (RateLimiterRejectedException)
     {
         return Results.StatusCode(StatusCodes.Status429TooManyRequests);
     }
@@ -83,17 +82,11 @@ app.MapGet("/users/{id}", async (string id, IUsersClient client, CancellationTok
     }
 });
 
-app.MapGet("/reload", (IConfiguration config, PolicyStore policyStore, IMemoryCache cache) =>
+app.MapGet("/reload", (IConfiguration config) =>
 {
     if (config is IConfigurationRoot root)
     {
         root.Reload();
-    }
-
-    policyStore?.Clear();
-    if (cache is MemoryCache memoryCache)
-    {
-        memoryCache.Compact(100);
     }
 
     return Results.Ok();

@@ -4,6 +4,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
+using PollySandbox.Extensions;
 using Refit;
 
 namespace PollySandbox;
@@ -12,6 +13,8 @@ public static class ServiceCollectionExtensions
 {
     public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddResilience();
+
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
 
@@ -21,8 +24,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton(Random.Shared);
         services.AddSingleton<IMetricsPublisher, MetricsPublisher>();
-        services.AddSingleton<PolicyStore>();
-        services.AddSingleton<PolicyFactory>();
+        services.AddSingleton<ResiliencePipelineFactory>();
         services.AddSingleton<IHttpContentSerializer>((serviceProvider) =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<JsonOptions>>();
