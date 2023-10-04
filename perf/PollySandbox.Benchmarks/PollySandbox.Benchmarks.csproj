@@ -20,9 +20,6 @@
       <_Parameter3>PollySandbox.csproj</_Parameter3>
       <_Parameter4>-1</_Parameter4>
     </AssemblyAttribute>
-    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-      <_Parameter1>HttpBundlePath</_Parameter1>
-      <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)\bundle.json'))</_Parameter2>
-    </AssemblyAttribute>
+    <AssemblyMetadata Include="HttpBundlePath" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)\bundle.json'))" />
   </ItemGroup>
 </Project>
