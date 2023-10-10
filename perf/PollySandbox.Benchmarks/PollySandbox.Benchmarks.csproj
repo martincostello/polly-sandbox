@@ -6,9 +6,9 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.8" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.9" />
     <PackageReference Include="JustEat.HttpClientInterception" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\PollySandbox\PollySandbox.csproj" />
