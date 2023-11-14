@@ -8,7 +8,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="BenchmarkDotNet" Version="0.13.10" />
     <PackageReference Include="JustEat.HttpClientInterception" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.14" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\PollySandbox\PollySandbox.csproj" />
