@@ -15,9 +15,11 @@ updates:
     BenchmarkDotNet:
       patterns:
         - BenchmarkDotNet*
-    xunit:
+    polly:
       patterns:
         - Polly*
+    xunit:
+      patterns:
         - xunit*
   schedule:
     interval: weekly
