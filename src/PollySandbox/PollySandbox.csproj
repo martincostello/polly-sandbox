@@ -6,6 +6,6 @@
   <ItemGroup>
     <PackageReference Include="Polly.Extensions" Version="8.4.1" />
     <PackageReference Include="Polly.RateLimiting" Version="8.4.1" />
-    <PackageReference Include="Refit" Version="7.1.2" />
+    <PackageReference Include="Refit" Version="7.2.1" />
   </ItemGroup>
 </Project>
