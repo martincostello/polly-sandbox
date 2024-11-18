@@ -4,8 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Polly.Extensions" Version="8.4.2" />
-    <PackageReference Include="Polly.RateLimiting" Version="8.4.2" />
+    <PackageReference Include="Polly.Extensions" Version="8.5.0" />
+    <PackageReference Include="Polly.RateLimiting" Version="8.5.0" />
     <PackageReference Include="Refit" Version="8.0.0" />
   </ItemGroup>
 </Project>
