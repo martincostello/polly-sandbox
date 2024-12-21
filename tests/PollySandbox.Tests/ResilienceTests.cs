@@ -35,7 +35,8 @@ public class ResilienceTests
         // Act and Assert
         await Assert.ThrowsAsync<TimeoutRejectedException>(
             () => client.ExecuteAsync(
-                (_) => Task.Delay(Timeout.Infinite, source.Token)));
+                (_) => Task.Delay(Timeout.Infinite, source.Token),
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -47,7 +48,8 @@ public class ResilienceTests
         // Act and Assert
         var exception = await Assert.ThrowsAsync<TimeoutRejectedException>(
             () => client.ExecuteAsync(
-                (token) => Task.Delay(TimeSpan.FromSeconds(5), token)));
+                (token) => Task.Delay(TimeSpan.FromSeconds(5), token),
+                TestContext.Current.CancellationToken));
 
         exception.Timeout.ShouldBe(TimeSpan.FromSeconds(2));
     }
@@ -74,13 +76,15 @@ public class ResilienceTests
         {
             await Assert.ThrowsAsync<ApiException>(
                 () => client.ExecuteAsync(
-                    (_) => ThrowsAsync(statusCode)));
+                    (_) => ThrowsAsync(statusCode),
+                    TestContext.Current.CancellationToken));
         }
 
         // Act and Assert
         await Assert.ThrowsAsync<BrokenCircuitException>(
             () => client.ExecuteAsync(
-                (_) => Task.FromException(new HttpRequestException())));
+                (_) => Task.FromException(new HttpRequestException()),
+                TestContext.Current.CancellationToken));
 
         // Arrange - Verify that circuit breaker is reset
         configuration.Reload();
@@ -88,7 +92,8 @@ public class ResilienceTests
         // Assert
         await Assert.ThrowsAsync<ApiException>(
             () => client.ExecuteAsync(
-                (_) => ThrowsAsync(statusCode)));
+                (_) => ThrowsAsync(statusCode),
+                TestContext.Current.CancellationToken));
 
         // Arrange - Force isolation of the circuit breaker
         isolated = true;
@@ -97,7 +102,8 @@ public class ResilienceTests
         // Act and Assert
         await Assert.ThrowsAsync<IsolatedCircuitException>(
             () => client.ExecuteAsync(
-                (_) => ThrowsAsync(statusCode)));
+                (_) => ThrowsAsync(statusCode),
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -121,13 +127,15 @@ public class ResilienceTests
         {
             await Assert.ThrowsAsync<TimeoutRejectedException>(
                 () => client.ExecuteAsync(
-                    (token) => Task.Delay(TimeSpan.FromSeconds(5), token)));
+                    (token) => Task.Delay(TimeSpan.FromSeconds(5), token),
+                    TestContext.Current.CancellationToken));
         }
 
         // Act and Assert
         await Assert.ThrowsAsync<BrokenCircuitException>(
             () => client.ExecuteAsync(
-                (token) => Task.Delay(TimeSpan.FromSeconds(5), token)));
+                (token) => Task.Delay(TimeSpan.FromSeconds(5), token),
+                TestContext.Current.CancellationToken));
 
         // Arrange - Verify that circuit breaker is reset
         isolated = false;
@@ -136,7 +144,8 @@ public class ResilienceTests
         // Act and Assert
         await Assert.ThrowsAsync<TimeoutRejectedException>(
             () => client.ExecuteAsync(
-                (token) => Task.Delay(TimeSpan.FromSeconds(5), token)));
+                (token) => Task.Delay(TimeSpan.FromSeconds(5), token),
+                TestContext.Current.CancellationToken));
 
         // Arrange - Force isolation of the circuit breaker
         isolated = true;
@@ -145,7 +154,8 @@ public class ResilienceTests
         // Act and Assert
         await Assert.ThrowsAsync<IsolatedCircuitException>(
             () => client.ExecuteAsync(
-                (token) => Task.Delay(TimeSpan.FromSeconds(5), token)));
+                (token) => Task.Delay(TimeSpan.FromSeconds(5), token),
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -171,13 +181,15 @@ public class ResilienceTests
         {
             await Assert.ThrowsAsync<TaskCanceledException>(
                 () => client.ExecuteAsync(
-                    (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken)));
+                    (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken),
+                    TestContext.Current.CancellationToken));
         }
 
         // Act and Assert
         await Assert.ThrowsAsync<BrokenCircuitException>(
             () => client.ExecuteAsync(
-                (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken)));
+                (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken),
+                TestContext.Current.CancellationToken));
 
         // Arrange - Verify that circuit breaker is reset
         isolated = false;
@@ -186,7 +198,8 @@ public class ResilienceTests
         // Act and Assert
         await Assert.ThrowsAsync<TaskCanceledException>(
             () => client.ExecuteAsync(
-                (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken)));
+                (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken),
+                TestContext.Current.CancellationToken));
 
         // Arrange - Force isolation of the circuit breaker
         isolated = true;
@@ -195,7 +208,8 @@ public class ResilienceTests
         // Act and Assert
         await Assert.ThrowsAsync<IsolatedCircuitException>(
             () => client.ExecuteAsync(
-                (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken)));
+                (_) => Task.Delay(TimeSpan.FromSeconds(5), cancellationToken),
+                TestContext.Current.CancellationToken));
     }
 
     [Theory]
@@ -222,13 +236,15 @@ public class ResilienceTests
         {
             await Assert.ThrowsAsync<ApiException>(
                 () => client.ExecuteAsync(
-                    (_) => ThrowsAsync(statusCode)));
+                    (_) => ThrowsAsync(statusCode),
+                    TestContext.Current.CancellationToken));
         }
 
         // Act and Assert
         await Assert.ThrowsAsync<ApiException>(
             () => client.ExecuteAsync(
-                (_) => ThrowsAsync(statusCode)));
+                (_) => ThrowsAsync(statusCode),
+                TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -241,7 +257,7 @@ public class ResilienceTests
 
         // Assert
         await Assert.ThrowsAsync<IsolatedCircuitException>(
-            () => client.ExecuteAsync(ThrowsAsync<HttpRequestException>));
+            () => client.ExecuteAsync(ThrowsAsync<HttpRequestException>, TestContext.Current.CancellationToken));
 
         // Arrange - Verify that circuit breaker is reset
         isolated = false;
@@ -249,7 +265,7 @@ public class ResilienceTests
 
         // Assert
         await Assert.ThrowsAsync<HttpRequestException>(
-            () => client.ExecuteAsync(ThrowsAsync<HttpRequestException>));
+            () => client.ExecuteAsync(ThrowsAsync<HttpRequestException>, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -270,18 +286,21 @@ public class ResilienceTests
         {
             await Assert.ThrowsAsync<ApiException>(
                 () => client.ExecuteAsync(
-                    (_) => ThrowsAsync(HttpStatusCode.InternalServerError)));
+                    (_) => ThrowsAsync(HttpStatusCode.InternalServerError),
+                    TestContext.Current.CancellationToken));
         }
 
         // Act and Assert - First resource has broken the circuit
         await Assert.ThrowsAsync<BrokenCircuitException>(
             () => client.ExecuteAsync(
-                (_) => ThrowsAsync(HttpStatusCode.InternalServerError)));
+                (_) => ThrowsAsync(HttpStatusCode.InternalServerError),
+                TestContext.Current.CancellationToken));
 
         // Act and Assert - Second resource is unaffected
         var actual = await client.ExecuteWithFallbackAsync(
             (_) => ThrowsAsync(HttpStatusCode.InternalServerError),
-            () => true);
+            () => true,
+            TestContext.Current.CancellationToken);
 
         actual.ShouldBeTrue();
     }
@@ -317,7 +336,8 @@ public class ResilienceTests
                 {
                     executions++;
                     return ThrowsAsync(statusCode);
-                }));
+                },
+                TestContext.Current.CancellationToken));
 
         // Assert
         executions.ShouldBe(expected);
@@ -345,7 +365,8 @@ public class ResilienceTests
                 {
                     executions++;
                     return ThrowsAsync<TaskCanceledException>(_);
-                }));
+                },
+                TestContext.Current.CancellationToken));
 
         // Assert
         executions.ShouldBe(expected);
@@ -377,7 +398,8 @@ public class ResilienceTests
                 }
 
                 return expected;
-            });
+            },
+            TestContext.Current.CancellationToken);
 
         // Assert
         executions.ShouldBe(2);
@@ -405,26 +427,26 @@ public class ResilienceTests
         // Act
         for (int i = 0; i < rateLimit; i++)
         {
-            await client.ExecuteAsync(Action);
+            await client.ExecuteAsync(Action, TestContext.Current.CancellationToken);
         }
 
         // Assert
         await Assert.ThrowsAsync<RateLimiterRejectedException>(
-            () => client.ExecuteAsync(Action));
+            () => client.ExecuteAsync(Action, TestContext.Current.CancellationToken));
 
         client.RateLimitPartition = () => partition2;
 
-        (await client.ExecuteAsync(Action)).ShouldBeTrue();
+        (await client.ExecuteAsync(Action, TestContext.Current.CancellationToken)).ShouldBeTrue();
 
         // Arrange - Wait for reset
-        await Task.Delay(rateLimitPeriod * 2);
+        await Task.Delay(rateLimitPeriod * 2, TestContext.Current.CancellationToken);
 
         // Act and Assert
         client.RateLimitPartition = () => partition1;
-        (await client.ExecuteAsync(Action)).ShouldBeTrue();
+        (await client.ExecuteAsync(Action, TestContext.Current.CancellationToken)).ShouldBeTrue();
 
         client.RateLimitPartition = () => partition2;
-        (await client.ExecuteAsync(Action)).ShouldBeTrue();
+        (await client.ExecuteAsync(Action, TestContext.Current.CancellationToken)).ShouldBeTrue();
     }
 
     [Fact]
@@ -434,7 +456,7 @@ public class ResilienceTests
         (var client, _) = CreateClient();
 
         // Act
-        int actual = await client.ExecuteWithFallbackAsync((_) => Task.FromResult(10));
+        int actual = await client.ExecuteWithFallbackAsync((_) => Task.FromResult(10), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         actual.ShouldBe(10);
@@ -448,7 +470,8 @@ public class ResilienceTests
 
         // Act
         int actual = await client.ExecuteWithFallbackAsync(
-            (_) => ThrowsAsync<int>(HttpStatusCode.BadRequest));
+            (_) => ThrowsAsync<int>(HttpStatusCode.BadRequest),
+            cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         actual.ShouldBe(0);
@@ -463,7 +486,8 @@ public class ResilienceTests
         // Act
         int actual = await client.ExecuteWithFallbackAsync(
             (_) => ThrowsAsync<int>(HttpStatusCode.BadRequest),
-            () => 42);
+            () => 42,
+            TestContext.Current.CancellationToken);
 
         // Assert
         actual.ShouldBe(42);
