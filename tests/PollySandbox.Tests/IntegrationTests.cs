@@ -36,7 +36,7 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
         using var client = Fixture.CreateHttpClientForApp();
 
         // Act
-        var movie = await client.GetFromJsonAsync<Movie>("/movies/5");
+        var movie = await client.GetFromJsonAsync<Movie>("/movies/5", TestContext.Current.CancellationToken);
 
         // Assert
         movie.ShouldNotBeNull();
@@ -50,7 +50,7 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
         using var client = Fixture.CreateHttpClientForApp();
 
         // Act
-        var movies = await client.GetFromJsonAsync<IList<Movie>>("/movies");
+        var movies = await client.GetFromJsonAsync<IList<Movie>>("/movies", TestContext.Current.CancellationToken);
 
         // Assert
         movies.ShouldNotBeNull();
@@ -67,7 +67,7 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
         using var client = Fixture.CreateHttpClientForApp();
 
         // Act
-        var user = await client.GetFromJsonAsync<User>("/users/2");
+        var user = await client.GetFromJsonAsync<User>("/users/2", TestContext.Current.CancellationToken);
 
         // Assert
         user.ShouldNotBeNull();
@@ -81,7 +81,7 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
         using var client = Fixture.CreateHttpClientForApp();
 
         // Act
-        var users = await client.GetFromJsonAsync<IList<User>>("/users");
+        var users = await client.GetFromJsonAsync<IList<User>>("/users", TestContext.Current.CancellationToken);
 
         // Assert
         users.ShouldNotBeNull();
@@ -106,19 +106,19 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
         client2.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", "token-2");
 
         // Act
-        using var response200 = await client1.GetAsync(requestUri);
+        using var response200 = await client1.GetAsync(requestUri, TestContext.Current.CancellationToken);
 
         // Assert
         response200.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Act
-        using var response429 = await client1.GetAsync(requestUri);
+        using var response429 = await client1.GetAsync(requestUri, TestContext.Current.CancellationToken);
 
         // Assert
         response429.StatusCode.ShouldBe(HttpStatusCode.TooManyRequests);
 
         // Act
-        using var otherResponse200 = await client2.GetAsync(requestUri);
+        using var otherResponse200 = await client2.GetAsync(requestUri, TestContext.Current.CancellationToken);
 
         // Assert
         otherResponse200.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -143,8 +143,8 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
             Fixture.Services.GetRequiredService<IOptionsMonitor<ApiOptions>>().CurrentValue.GetEndpoint("Movies").Isolate.ToString().ShouldBe(value);
 
             // Act
-            using var movies = await client.GetAsync("/movies");
-            using var users = await client.GetAsync("/users");
+            using var movies = await client.GetAsync("/movies", TestContext.Current.CancellationToken);
+            using var users = await client.GetAsync("/users", TestContext.Current.CancellationToken);
 
             // Assert
             movies.StatusCode.ShouldBe(expected);
@@ -156,12 +156,13 @@ public class IntegrationTests : IAsyncLifetime, IDisposable
 
     protected ITestOutputHelper OutputHelper { get; }
 
-    public virtual Task InitializeAsync() => Task.CompletedTask;
+    public ValueTask InitializeAsync() => ValueTask.CompletedTask;
 
-    public virtual Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         Dispose();
-        return Task.CompletedTask;
+        GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
     }
 
     public void Dispose()
