@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="perf/PollySandbox.Benchmarks/PollySandbox.Benchmarks.csproj" />
+  <Project Path="src/PollySandbox/PollySandbox.csproj" />
+  <Project Path="tests/PollySandbox.Tests/PollySandbox.Tests.csproj" />
+</Solution>
