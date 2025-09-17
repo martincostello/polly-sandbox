@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.3" />
     <PackageReference Include="JustEat.HttpClientInterception" Version="5.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.9" />
   </ItemGroup>
