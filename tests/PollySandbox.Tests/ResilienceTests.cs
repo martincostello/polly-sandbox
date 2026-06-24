@@ -590,7 +590,7 @@ public class ResilienceTests
                 async (token) =>
                 {
                     await act(token);
-                    return new ApiResponse<bool>(new HttpResponseMessage(HttpStatusCode.OK), true, new());
+                    return new ApiResponse<bool>(new HttpResponseMessage(HttpStatusCode.OK) { RequestMessage = new() }, true, new());
                 },
                 cancellationToken);
         }
@@ -603,7 +603,7 @@ public class ResilienceTests
                 async (token) =>
                 {
                     var result = await act(token);
-                    return new ApiResponse<TResult>(new HttpResponseMessage(HttpStatusCode.OK), result, new());
+                    return new ApiResponse<TResult>(new HttpResponseMessage(HttpStatusCode.OK) { RequestMessage = new() }, result, new());
                 },
                 cancellationToken);
         }
@@ -619,7 +619,7 @@ public class ResilienceTests
                 async (token) =>
                 {
                     var result = await act(token);
-                    return new ApiResponse<TResult>(new HttpResponseMessage(HttpStatusCode.OK), result, new());
+                    return new ApiResponse<TResult>(new HttpResponseMessage(HttpStatusCode.OK) { RequestMessage = new() }, result, new());
                 },
                 new() { HandleExecutionFaults = true, FallbackValue = fallback },
                 cancellationToken);
